@@ -34,7 +34,16 @@ class Settings(BaseSettings):
     @computed_field
     @property
     def cors_origins(self) -> list[str]:
-        return json.loads(self.BACKEND_CORS_ORIGINS)
+        if not self.BACKEND_CORS_ORIGINS:
+            return []
+        try:
+            origins = json.loads(self.BACKEND_CORS_ORIGINS)
+            if isinstance(origins, list):
+                return origins
+            return [str(origins)]
+        except json.JSONDecodeError:
+            # Fallback: treat as comma-separated string if not valid JSON
+            return [origin.strip() for origin in self.BACKEND_CORS_ORIGINS.split(",") if origin.strip()]
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
