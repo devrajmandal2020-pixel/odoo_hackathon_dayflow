@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAuthStore } from '@/store/authStore';
 import apiClient from '@/lib/api-client';
-import type { PayrollRecord } from '@/types/api';
+import type { PayrollRecord, User } from '@/types/api';
 import { DollarSign, FileText, CheckCircle, X, Plus, Receipt } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { fadeIn, slideUp } from '@/lib/motion';
@@ -15,6 +15,51 @@ export function PayrollPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedSlip, setSelectedSlip] = useState<PayrollRecord | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenModalOpen, setIsGenModalOpen] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
+
+  useEffect(() => {
+    if (isAdmin && isGenModalOpen) {
+      const fetchUsers = async () => {
+        try {
+          const { data } = await apiClient.get<User[]>('/auth/users');
+          setUsers(data);
+          if (data.length > 0) {
+            setSelectedUserId(data[0].id);
+          }
+        } catch (error) {
+          console.error(error);
+          toast.error('Failed to load employee list');
+        }
+      };
+      fetchUsers();
+    }
+  }, [isAdmin, isGenModalOpen]);
+
+  const handleGenerateEmployeePayroll = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedUserId || !selectedMonth) {
+      toast.error('Please select an employee and a month');
+      return;
+    }
+    try {
+      setIsGenerating(true);
+      await apiClient.post('/payroll/generate', {
+        user_id: selectedUserId,
+        month: `${selectedMonth}-01`,
+      });
+      toast.success('Payslip generated successfully');
+      setIsGenModalOpen(false);
+      fetchPayroll();
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.response?.data?.detail || 'Failed to generate payslip');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const fetchPayroll = async () => {
     try {
@@ -112,12 +157,18 @@ export function PayrollPage() {
               Export CSV
             </button>
             <button
-              onClick={handleGenerate}
-              disabled={isGenerating}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-600 transition-colors disabled:opacity-50"
+              onClick={() => setIsGenModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-600 transition-colors"
             >
               <Plus className="w-5 h-5" />
-              Generate My Payslip (Test)
+              Generate Payslip
+            </button>
+            <button
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className="flex items-center gap-2 px-4 py-2 bg-secondary text-text-heading border border-border rounded-xl hover:bg-gray-100 transition-colors disabled:opacity-50"
+            >
+              Generate My Payslip
             </button>
           </div>
         )}
@@ -334,6 +385,87 @@ export function PayrollPage() {
                   </div>
                 </div>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Generate Payslip Modal */}
+      <AnimatePresence>
+        {isGenModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <motion.div
+              variants={slideUp}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              className="bg-bg-card w-full max-w-md rounded-2xl shadow-xl overflow-hidden flex flex-col"
+            >
+              <div className="flex items-center justify-between p-6 border-b border-border bg-bg-main/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary-light rounded-xl flex items-center justify-center text-primary">
+                    <Receipt className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-text-heading">Generate Employee Payslip</h2>
+                    <p className="text-sm text-text-muted">Select employee and month</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsGenModalOpen(false)}
+                  className="p-2 text-text-muted hover:bg-bg-main rounded-xl transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleGenerateEmployeePayroll} className="p-6 space-y-6">
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-text-heading">Select Employee</label>
+                  <select
+                    value={selectedUserId}
+                    onChange={(e) => setSelectedUserId(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-bg-main border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
+                    required
+                  >
+                    <option value="" disabled>Select an employee</option>
+                    {users.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.full_name} ({u.employee_id || 'No ID'})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-text-heading">Select Month</label>
+                  <input
+                    type="month"
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-bg-main border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
+                    required
+                  />
+                </div>
+
+                <div className="pt-4 border-t border-border flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsGenModalOpen(false)}
+                    className="px-4 py-2 bg-secondary text-text-heading border border-border rounded-xl hover:bg-gray-100 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isGenerating}
+                    className="px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-600 transition-colors disabled:opacity-50"
+                  >
+                    {isGenerating ? 'Generating...' : 'Generate'}
+                  </button>
+                </div>
+              </form>
             </motion.div>
           </div>
         )}
