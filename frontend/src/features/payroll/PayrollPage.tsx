@@ -65,9 +65,9 @@ export function PayrollPage() {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
     }).format(amount);
   };
 
@@ -219,7 +219,7 @@ export function PayrollPage() {
               initial="hidden"
               animate="visible"
               exit="hidden"
-              className="bg-bg-card w-full max-w-2xl rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]"
+              className="bg-bg-card w-full max-w-2xl rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh] print-container"
             >
               <div className="flex items-center justify-between p-6 border-b border-border bg-bg-main/30">
                 <div className="flex items-center gap-3">
@@ -231,12 +231,21 @@ export function PayrollPage() {
                     <p className="text-sm text-text-muted">{selectedSlip.month}</p>
                   </div>
                 </div>
-                <button
-                  onClick={() => setSelectedSlip(null)}
-                  className="p-2 text-text-muted hover:bg-bg-main rounded-xl transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                <div className="flex items-center gap-2 no-print">
+                  <button
+                    onClick={() => window.print()}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-primary-50 text-primary hover:bg-primary-100 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <FileText className="w-4 h-4" />
+                    Download PDF
+                  </button>
+                  <button
+                    onClick={() => setSelectedSlip(null)}
+                    className="p-2 text-text-muted hover:bg-bg-main rounded-xl transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
 
               <div className="p-6 overflow-y-auto">

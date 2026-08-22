@@ -61,7 +61,7 @@ export function PayrollSidebar({ totalProcessed = 125000, pendingApprovals = 3, 
             <div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-semibold text-text-heading">Total Processed</span>
-                <span className="text-sm font-bold text-text-heading">${(totalProcessed / 1000).toFixed(1)}k</span>
+                <span className="text-sm font-bold text-text-heading">₹{(totalProcessed / 1000).toFixed(1)}k</span>
               </div>
               <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
                 <div className="h-full bg-success rounded-full w-[100%]" />

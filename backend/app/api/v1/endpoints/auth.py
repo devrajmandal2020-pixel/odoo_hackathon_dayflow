@@ -149,3 +149,34 @@ async def logout(response: Response):
 async def get_me(current_user: User = Depends(get_current_user)):
     """Get the currently authenticated user's profile."""
     return current_user
+
+
+from app.schemas.user import UserUpdate, UserAdminUpdate
+from typing import List
+
+@router.put("/me", response_model=UserResponse)
+async def update_me(
+    update_data: UserUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Update current user's profile information."""
+    update_dict = update_data.model_dump(exclude_unset=True)
+    for key, value in update_dict.items():
+        setattr(current_user, key, value)
+        
+    await db.commit()
+    await db.refresh(current_user)
+    return current_user
+
+
+@router.get("/users", response_model=List[UserResponse])
+async def get_all_users(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get all users (for HR/Admin viewing employees)."""
+    # Anyone authenticated can view users for now (needed for Employee directory)
+    from sqlalchemy import select
+    result = await db.execute(select(User).order_by(User.full_name))
+    return result.scalars().all()
