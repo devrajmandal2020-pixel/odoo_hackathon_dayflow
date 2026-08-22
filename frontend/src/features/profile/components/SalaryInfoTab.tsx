@@ -119,35 +119,10 @@ export function SalaryInfoTab({ userId }: { userId?: string }) {
     <Card className="border-none shadow-none bg-transparent">
       <CardContent className="p-0">
         <form className="space-y-8" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-            {/* Left Column - Personal Info */}
-            <div className="space-y-5">
-              <h3 className="text-sm font-semibold text-text-heading mb-6 border-b border-border pb-2">Personal Details</h3>
-              <div className="grid grid-cols-[140px_1fr] items-center gap-4">
-                <label className="text-sm font-medium text-text-muted">Date of Birth</label>
-                <Input name="date_of_birth" type="date" value={formData.date_of_birth} onChange={handleProfileChange} className="bg-transparent border-b border-border border-x-0 border-t-0 rounded-none focus:ring-0 px-0" />
-              </div>
-              <div className="grid grid-cols-[140px_1fr] items-center gap-4">
-                <label className="text-sm font-medium text-text-muted">Nationality</label>
-                <Input name="nationality" value={formData.nationality} onChange={handleProfileChange} className="bg-transparent border-b border-border border-x-0 border-t-0 rounded-none focus:ring-0 px-0" />
-              </div>
-              <div className="grid grid-cols-[140px_1fr] items-center gap-4">
-                <label className="text-sm font-medium text-text-muted">Gender</label>
-                <Input name="gender" value={formData.gender} onChange={handleProfileChange} className="bg-transparent border-b border-border border-x-0 border-t-0 rounded-none focus:ring-0 px-0" />
-              </div>
-              <div className="grid grid-cols-[140px_1fr] items-center gap-4">
-                <label className="text-sm font-medium text-text-muted">Marital Status</label>
-                <Input name="marital_status" value={formData.marital_status} onChange={handleProfileChange} className="bg-transparent border-b border-border border-x-0 border-t-0 rounded-none focus:ring-0 px-0" />
-              </div>
-              <div className="grid grid-cols-[140px_1fr] items-center gap-4">
-                <label className="text-sm font-medium text-text-muted">Date of Joining</label>
-                <Input name="date_of_joining" type="date" value={formData.date_of_joining} onChange={handleProfileChange} className="bg-transparent border-b border-border border-x-0 border-t-0 rounded-none focus:ring-0 px-0" />
-              </div>
-            </div>
-            
-            {/* Right Column - Bank details */}
-            <div className="space-y-5">
-              <h3 className="text-sm font-semibold text-text-heading mb-6 border-b border-border pb-2">Bank Details</h3>
+          {/* Bank Details */}
+          <div className="space-y-5">
+            <h3 className="text-sm font-semibold text-text-heading mb-6 border-b border-border pb-2">Bank Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-5">
               <div className="grid grid-cols-[140px_1fr] items-center gap-4">
                 <label className="text-sm font-medium text-text-muted">Account Number</label>
                 <Input name="bank_account" value={formData.bank_account} onChange={handleProfileChange} className="bg-transparent border-b border-border border-x-0 border-t-0 rounded-none focus:ring-0 px-0" />

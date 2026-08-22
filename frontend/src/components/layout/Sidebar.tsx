@@ -14,7 +14,6 @@ import { useAuthStore } from '@/store/authStore';
 import { slideInLeft } from '@/lib/motion';
 
 const employeeNavItems = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/profile', icon: UserCircle, label: 'Profile' },
   { to: '/attendance', icon: Clock, label: 'Attendance' },
   { to: '/time-off', icon: Palmtree, label: 'Time Off' },

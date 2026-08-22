@@ -46,7 +46,9 @@ export function LeaveRequestModal({ isOpen, onClose }: LeaveRequestModalProps) {
         data.append('medical_certificate', file);
       }
 
-      await apiClient.post('/leave/request', data);
+      await apiClient.post('/leave/request', data, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       
       toast.success('Leave request submitted successfully');
       setFormData({ leave_type: 'casual', start_date: '', end_date: '', reason: '' });

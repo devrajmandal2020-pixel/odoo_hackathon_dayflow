@@ -63,8 +63,11 @@ export interface Attendance {
   date: string;
   check_in: string | null;
   check_out: string | null;
-  status: 'present' | 'absent' | 'half-day';
+  status: 'present' | 'absent' | 'half-day' | 'leave';
   work_hours: number;
+  extra_hours?: number;
+  user_name?: string;
+  user_email?: string;
 }
 
 export interface AttendanceSummary {

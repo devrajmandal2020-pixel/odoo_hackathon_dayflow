@@ -12,9 +12,11 @@ export function PrivateInfoTab({ userId }: { userId?: string }) {
     nationality: '',
     gender: '',
     marital_status: '',
+    date_of_joining: '',
     bank_details: '',
     bank_account: '',
     branch_number: '',
+    key_code: '',
     uan_no: '',
   });
 
@@ -29,9 +31,11 @@ export function PrivateInfoTab({ userId }: { userId?: string }) {
           nationality: data.nationality || '',
           gender: data.gender || '',
           marital_status: data.marital_status || '',
+          date_of_joining: data.date_of_joining || '',
           bank_account: data.bank_account || '',
           bank_details: data.bank_details || '',
           branch_number: data.branch_number || '',
+          key_code: data.key_code || '',
           uan_no: data.uan_no || '',
         });
       } catch (error) {
@@ -47,6 +51,7 @@ export function PrivateInfoTab({ userId }: { userId?: string }) {
       setLoading(true);
       const payload = { ...formData };
       if (!payload.date_of_birth) payload.date_of_birth = null as any;
+      if (!payload.date_of_joining) payload.date_of_joining = null as any;
       
       await apiClient.put(endpoint, payload);
       toast.success('Private information updated successfully');
@@ -76,6 +81,7 @@ export function PrivateInfoTab({ userId }: { userId?: string }) {
               <Input name="nationality" label="Nationality" placeholder="e.g. American" value={formData.nationality} onChange={handleChange} />
               <Input name="gender" label="Gender" placeholder="e.g. Female" value={formData.gender} onChange={handleChange} />
               <Input name="marital_status" label="Marital Status" placeholder="e.g. Single" value={formData.marital_status} onChange={handleChange} />
+              <Input name="date_of_joining" label="Date of Joining" type="date" value={formData.date_of_joining} onChange={handleChange} />
             </div>
             
             <div className="space-y-4">
@@ -83,6 +89,7 @@ export function PrivateInfoTab({ userId }: { userId?: string }) {
               <Input name="bank_details" label="Bank Name" placeholder="e.g. Chase Bank" value={formData.bank_details} onChange={handleChange} />
               <Input name="bank_account" label="Account Number" type="password" value={formData.bank_account} onChange={handleChange} />
               <Input name="branch_number" label="Routing/IFSC Code" value={formData.branch_number} onChange={handleChange} />
+              <Input name="key_code" label="PAN Number" placeholder="e.g. ABCDE1234F" value={formData.key_code} onChange={handleChange} />
               <Input name="uan_no" label="UAN Number" value={formData.uan_no} onChange={handleChange} />
             </div>
           </div>

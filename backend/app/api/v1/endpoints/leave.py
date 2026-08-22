@@ -1,5 +1,5 @@
 from datetime import date, datetime, timezone
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -31,7 +31,7 @@ async def create_leave_request(
     start_date: date = Form(...),
     end_date: date = Form(...),
     reason: str = Form(...),
-    medical_certificate: UploadFile | None = File(None),
+    medical_certificate: Optional[UploadFile] = None,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):

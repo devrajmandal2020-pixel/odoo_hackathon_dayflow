@@ -4,7 +4,13 @@ export function getErrorMessage(error: any, fallback: string = 'An error occurre
     return detail;
   }
   if (Array.isArray(detail)) {
-    return detail[0]?.msg || fallback;
+    const err = detail[0];
+    const field = err?.loc ? err.loc[err.loc.length - 1] : '';
+    const msg = err?.msg || '';
+    if ((msg.toLowerCase() === 'field required' || err?.type === 'missing') && field) {
+      return `Field required: ${field}`;
+    }
+    return msg || fallback;
   }
   if (detail && typeof detail === 'object') {
     return (detail as any).message || fallback;

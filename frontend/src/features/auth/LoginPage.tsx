@@ -50,7 +50,7 @@ export function LoginPage() {
 
       login(userData, tokenData.access_token);
       toast.success('Welcome back!');
-      navigate('/dashboard');
+      navigate('/');
     } catch (error: any) {
       const message = error.response?.data?.detail || 'Login failed. Please try again.';
       toast.error(message);

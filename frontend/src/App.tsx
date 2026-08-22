@@ -35,7 +35,7 @@ function RoleBasedIndex() {
   if (isAdmin) {
     return <EmployeesPage />;
   }
-  return <Navigate to="/dashboard" replace />;
+  return <Navigate to="/profile" replace />;
 }
 
 function App() {
@@ -82,7 +82,14 @@ function App() {
             }
           >
             <Route index element={<RoleBasedIndex />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute requiredRole="hr">
+                  <DashboardPage />
+                </ProtectedRoute>
+              }
+            />
             {/* Future routes */}
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/employees/:id" element={<ProfilePage />} />
