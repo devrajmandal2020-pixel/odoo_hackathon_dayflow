@@ -76,10 +76,6 @@ function App() {
             <Route path="/attendance" element={<AttendancePage />} />
             <Route path="/time-off" element={<TimeOffPage />} />
             <Route path="/payroll" element={<PayrollPage />} />
-            <Route path="/calendar" element={<div className="p-6">Calendar (Coming Soon)</div>} />
-            <Route path="/projects" element={<div className="p-6">Projects (Coming Soon)</div>} />
-            <Route path="/team" element={<div className="p-6">Team (Coming Soon)</div>} />
-            <Route path="/documents" element={<div className="p-6">Documents (Coming Soon)</div>} />
           </Route>
 
           {/* Redirect root */}

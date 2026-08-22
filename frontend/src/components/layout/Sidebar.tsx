@@ -31,9 +31,6 @@ const adminNavItems = [
   { to: '/attendance', icon: Clock, label: 'Attendance' },
   { to: '/time-off', icon: Palmtree, label: 'Time Off' },
   { to: '/payroll', icon: DollarSign, label: 'Payroll' },
-  { to: '/calendar', icon: Calendar, label: 'Calendar' },
-  { to: '/projects', icon: FolderKanban, label: 'Projects' },
-  { to: '/documents', icon: FileText, label: 'Documents' },
 ];
 
 export function Sidebar() {
