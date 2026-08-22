@@ -178,54 +178,7 @@ export function SalaryInfoTab({ userId }: { userId?: string }) {
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-              <div className="space-y-5">
-                <div className="grid grid-cols-[140px_1fr] items-center gap-4">
-                  <label className="text-sm font-medium text-text-muted">Monthly Wage (₹)</label>
-                  <Input 
-                    name="monthly_wage" 
-                    type="number" 
-                    value={salaryData.monthly_wage} 
-                    onChange={handleSalaryChange} 
-                    disabled={!isAdmin}
-                    className="bg-transparent border-b border-border border-x-0 border-t-0 rounded-none focus:ring-0 px-0" 
-                  />
-                </div>
-                <div className="grid grid-cols-[140px_1fr] items-center gap-4">
-                  <label className="text-sm font-medium text-text-muted">Yearly Wage (₹)</label>
-                  <Input 
-                    name="yearly_wage" 
-                    type="number" 
-                    value={salaryData.yearly_wage} 
-                    onChange={handleSalaryChange} 
-                    disabled={!isAdmin}
-                    className="bg-transparent border-b border-border border-x-0 border-t-0 rounded-none focus:ring-0 px-0" 
-                  />
-                </div>
-                <div className="grid grid-cols-[140px_1fr] items-center gap-4">
-                  <label className="text-sm font-medium text-text-muted">Working Days / Week</label>
-                  <Input 
-                    name="working_days_per_week" 
-                    type="number" 
-                    value={salaryData.working_days_per_week} 
-                    onChange={handleSalaryChange} 
-                    disabled={!isAdmin}
-                    className="bg-transparent border-b border-border border-x-0 border-t-0 rounded-none focus:ring-0 px-0" 
-                  />
-                </div>
-                <div className="grid grid-cols-[140px_1fr] items-center gap-4">
-                  <label className="text-sm font-medium text-text-muted">Break Hours / Day</label>
-                  <Input 
-                    name="break_time_hours" 
-                    type="number" 
-                    step="0.5"
-                    value={salaryData.break_time_hours} 
-                    onChange={handleSalaryChange} 
-                    disabled={!isAdmin}
-                    className="bg-transparent border-b border-border border-x-0 border-t-0 rounded-none focus:ring-0 px-0" 
-                  />
-                </div>
-              </div>
-
+              {/* Left Column: Basic, HRA, Medical, Professional Tax */}
               <div className="space-y-5">
                 <div className="grid grid-cols-[140px_1fr] items-center gap-4">
                   <label className="text-sm font-medium text-text-muted">Basic Salary (%)</label>
@@ -266,6 +219,55 @@ export function SalaryInfoTab({ userId }: { userId?: string }) {
                     name="professional_tax" 
                     type="number" 
                     value={salaryData.professional_tax} 
+                    onChange={handleSalaryChange} 
+                    disabled={!isAdmin}
+                    className="bg-transparent border-b border-border border-x-0 border-t-0 rounded-none focus:ring-0 px-0" 
+                  />
+                </div>
+              </div>
+
+              {/* Right Column: Working Days, Break Hours, Monthly Wage, Yearly Wage */}
+              <div className="space-y-5">
+                <div className="grid grid-cols-[140px_1fr] items-center gap-4">
+                  <label className="text-sm font-medium text-text-muted">Working Days / Week</label>
+                  <Input 
+                    name="working_days_per_week" 
+                    type="number" 
+                    value={salaryData.working_days_per_week} 
+                    onChange={handleSalaryChange} 
+                    disabled={!isAdmin}
+                    className="bg-transparent border-b border-border border-x-0 border-t-0 rounded-none focus:ring-0 px-0" 
+                  />
+                </div>
+                <div className="grid grid-cols-[140px_1fr] items-center gap-4">
+                  <label className="text-sm font-medium text-text-muted">Break Hours / Day</label>
+                  <Input 
+                    name="break_time_hours" 
+                    type="number" 
+                    step="0.5"
+                    value={salaryData.break_time_hours} 
+                    onChange={handleSalaryChange} 
+                    disabled={!isAdmin}
+                    className="bg-transparent border-b border-border border-x-0 border-t-0 rounded-none focus:ring-0 px-0" 
+                  />
+                </div>
+                <div className="grid grid-cols-[140px_1fr] items-center gap-4">
+                  <label className="text-sm font-medium text-text-muted">Monthly Wage (₹)</label>
+                  <Input 
+                    name="monthly_wage" 
+                    type="number" 
+                    value={salaryData.monthly_wage} 
+                    onChange={handleSalaryChange} 
+                    disabled={!isAdmin}
+                    className="bg-transparent border-b border-border border-x-0 border-t-0 rounded-none focus:ring-0 px-0" 
+                  />
+                </div>
+                <div className="grid grid-cols-[140px_1fr] items-center gap-4">
+                  <label className="text-sm font-medium text-text-muted">Yearly Wage (₹)</label>
+                  <Input 
+                    name="yearly_wage" 
+                    type="number" 
+                    value={salaryData.yearly_wage} 
                     onChange={handleSalaryChange} 
                     disabled={!isAdmin}
                     className="bg-transparent border-b border-border border-x-0 border-t-0 rounded-none focus:ring-0 px-0" 
