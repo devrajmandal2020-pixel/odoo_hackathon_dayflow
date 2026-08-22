@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, Bell, Settings, Check, Menu } from 'lucide-react';
+import { Search, Bell, Check, Menu } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { Avatar } from '@/components/ui/Avatar';
 import { fadeIn } from '@/lib/motion';
@@ -161,14 +161,6 @@ export function Navbar({ onMenuClick }: NavbarProps) {
             )}
           </AnimatePresence>
         </div>
-
-        {/* Settings */}
-        <button 
-          onClick={() => window.location.href = '/profile'}
-          className="p-2 rounded-xl hover:bg-bg-main transition-colors cursor-pointer"
-        >
-          <Settings className="w-5 h-5 text-text-body" />
-        </button>
 
         {/* Profile */}
         <Avatar
