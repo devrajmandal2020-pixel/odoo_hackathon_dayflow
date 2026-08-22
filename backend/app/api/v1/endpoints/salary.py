@@ -3,13 +3,33 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies.auth import get_current_admin
+from app.dependencies.auth import get_current_user, get_current_admin
 from app.dependencies.db import get_db
 from app.models.salary import SalaryInfo
 from app.models.user import User
 from app.schemas.salary import SalaryInfoResponse, SalaryInfoUpdate
 
 router = APIRouter()
+
+@router.get("/me", response_model=SalaryInfoResponse)
+async def get_my_salary_info(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Get current user's salary info.
+    """
+    stmt = select(SalaryInfo).where(SalaryInfo.user_id == current_user.id)
+    result = await db.execute(stmt)
+    salary = result.scalar_one_or_none()
+
+    if not salary:
+        salary = SalaryInfo(user_id=current_user.id)
+        db.add(salary)
+        await db.commit()
+        await db.refresh(salary)
+
+    return salary
 
 @router.get("/{user_id}", response_model=SalaryInfoResponse)
 async def get_salary_info(
