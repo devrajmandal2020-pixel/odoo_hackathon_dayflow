@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import apiClient from '@/lib/api-client';
 import toast from 'react-hot-toast';
 
-export function PrivateInfoTab() {
+export function PrivateInfoTab({ userId }: { userId?: string }) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     date_of_birth: '',
@@ -18,10 +18,12 @@ export function PrivateInfoTab() {
     uan_no: '',
   });
 
+  const endpoint = userId ? `/profile/${userId}` : '/profile/me';
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const { data } = await apiClient.get('/profile/me');
+        const { data } = await apiClient.get(endpoint);
         setFormData({
           date_of_birth: data.date_of_birth || '',
           nationality: data.nationality || '',
@@ -37,7 +39,7 @@ export function PrivateInfoTab() {
       }
     };
     fetchProfile();
-  }, []);
+  }, [endpoint]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +48,7 @@ export function PrivateInfoTab() {
       const payload = { ...formData };
       if (!payload.date_of_birth) payload.date_of_birth = null as any;
       
-      await apiClient.put('/profile/me', payload);
+      await apiClient.put(endpoint, payload);
       toast.success('Private information updated successfully');
     } catch (error) {
       console.error(error);

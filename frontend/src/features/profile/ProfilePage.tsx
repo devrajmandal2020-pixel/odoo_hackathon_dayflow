@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAuthStore } from '@/store/authStore';
 import { Avatar } from '@/components/ui/Avatar';
@@ -11,158 +12,199 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import apiClient from '@/lib/api-client';
 import toast from 'react-hot-toast';
+import type { User } from '@/types/api';
 
 type Tab = 'resume' | 'private' | 'salary' | 'security';
 
 export function ProfilePage() {
-  const { user, setUser } = useAuthStore();
+  const { user: currentUser, setUser } = useAuthStore();
+  const { id } = useParams();
+  
+  const [targetUser, setTargetUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('resume');
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
+
+  const isOwnProfile = !id || id === currentUser?.id;
+  const displayUser = isOwnProfile ? currentUser : targetUser;
+  const isAdminOrHR = currentUser?.role === 'admin' || currentUser?.role === 'hr';
   
+  // Can only see private tabs if it's own profile OR user is admin/hr
+  const canSeePrivateTabs = isOwnProfile || isAdminOrHR;
+
   const [formData, setFormData] = useState({
-    full_name: user?.full_name || '',
-    phone: user?.phone || '',
-    address: user?.address || '',
+    full_name: '',
+    phone: '',
+    address: '',
   });
 
-  if (!user) return null;
+  useEffect(() => {
+    if (!isOwnProfile && id) {
+      const fetchTargetUser = async () => {
+        try {
+          const { data } = await apiClient.get(`/auth/users/${id}`);
+          setTargetUser(data);
+        } catch (error) {
+          console.error(error);
+          setFetchError(true);
+        }
+      };
+      fetchTargetUser();
+    }
+  }, [id, isOwnProfile]);
 
-  const tabs: { id: Tab; label: string }[] = [
-    { id: 'resume', label: 'Resume' },
-    { id: 'private', label: 'Private Info' },
-    { id: 'salary', label: 'Salary Info' },
-    { id: 'security', label: 'Security' },
-  ];
+  useEffect(() => {
+    if (displayUser) {
+      setFormData({
+        full_name: displayUser.full_name || '',
+        phone: displayUser.phone || '',
+        address: displayUser.address || '',
+      });
+    }
+  }, [displayUser]);
 
-  const handleUpdateProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
+  if (!currentUser) return null;
+  if (fetchError) return <div className="p-8 text-center text-red-500">Error loading user profile or you don't have permission.</div>;
+  if (!displayUser) return <div className="p-8">Loading...</div>;
+
+  const handleSaveProfile = async () => {
     try {
       setLoading(true);
-      const { data } = await apiClient.put('/auth/me', formData);
-      setUser(data);
-      toast.success('Profile updated successfully');
+      if (isOwnProfile) {
+        const { data } = await apiClient.put('/auth/me', formData);
+        setUser(data);
+        toast.success('Profile updated successfully');
+      } else {
+        toast.error("Updating other user's basic info is not supported yet");
+      }
       setIsEditing(false);
     } catch (error) {
+      console.error(error);
       toast.error('Failed to update profile');
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
-      {/* Profile Header */}
-      <div className="bg-bg-card rounded-xl shadow-sm border border-border p-8 flex flex-col md:flex-row gap-12 relative">
-        <button 
-          onClick={() => {
-            setFormData({
-              full_name: user?.full_name || '',
-              phone: user?.phone || '',
-              address: user?.address || '',
-            });
-            setIsEditing(true);
-          }}
-          className="absolute top-8 right-8 flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary hover:bg-primary-100 rounded-lg transition-colors font-medium text-sm"
-        >
-          <Edit className="w-4 h-4" />
-          Edit Profile
-        </button>
+  const tabs = [
+    { id: 'resume', label: 'Resume' },
+    ...(canSeePrivateTabs ? [
+      { id: 'private', label: 'Private Information' },
+      { id: 'salary', label: 'Salary Information' },
+      { id: 'security', label: 'Security' },
+    ] : [])
+  ];
 
-        <div className="flex gap-8">
-          <div className="relative">
-            <Avatar src={user.profile_picture} alt={user.full_name} fallback={user.full_name.charAt(0)} className="w-32 h-32 text-4xl" />
-          </div>
-          <div className="space-y-4 min-w-[200px]">
-            <h1 className="text-3xl font-semibold text-text-heading">{user.full_name}</h1>
-            <div className="space-y-3">
-              <div className="border-b border-border pb-1 text-sm text-text-body">{user.position || 'Job Position'}</div>
-              <div className="border-b border-border pb-1 text-sm text-text-body">{user.email}</div>
-              <div className="border-b border-border pb-1 text-sm text-text-body">{user.phone || 'Mobile'}</div>
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-text-heading">{isOwnProfile ? 'My Profile' : 'Employee Profile'}</h1>
+        {isOwnProfile && (
+          <Button onClick={() => setIsEditing(!isEditing)} variant="outline" className="gap-2">
+            <Edit className="w-4 h-4" />
+            Edit Profile
+          </Button>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Left Sidebar */}
+        <div className="lg:col-span-1 space-y-6">
+          <div className="bg-white rounded-3xl p-6 text-center border border-border">
+            <div className="relative inline-block mb-4">
+              <Avatar 
+                src={displayUser.profile_picture} 
+                fallback={displayUser.full_name.charAt(0)} 
+                className="w-24 h-24 text-2xl mx-auto ring-4 ring-bg-main" 
+              />
+              <span className="absolute bottom-1 right-1 w-4 h-4 bg-success border-2 border-white rounded-full"></span>
+            </div>
+            <h2 className="text-lg font-bold text-text-heading">{displayUser.full_name}</h2>
+            <p className="text-sm text-text-muted mt-1">{displayUser.position || displayUser.role || 'Employee'}</p>
+            
+            <div className="mt-6 pt-6 border-t border-border space-y-4 text-left">
+              <div>
+                <p className="text-xs text-text-muted font-medium mb-1">Email</p>
+                <p className="text-sm font-medium text-text-main truncate">{displayUser.email}</p>
+              </div>
+              <div>
+                <p className="text-xs text-text-muted font-medium mb-1">Phone</p>
+                <p className="text-sm font-medium text-text-main">{displayUser.phone || 'Not provided'}</p>
+              </div>
+              <div>
+                <p className="text-xs text-text-muted font-medium mb-1">Location</p>
+                <p className="text-sm font-medium text-text-main">{displayUser.address || 'Not provided'}</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="flex-1 space-y-4 min-w-[250px] pt-10 md:pt-10">
-          <div className="border-b border-border pb-1 text-sm text-text-body">DayFlow Inc.</div>
-          <div className="border-b border-border pb-1 text-sm text-text-body">{user.department || 'Department'}</div>
-          <div className="border-b border-border pb-1 text-sm text-text-body">Manager</div>
-          <div className="border-b border-border pb-1 text-sm text-text-body">{user.address || 'Location'}</div>
+        {/* Main Content */}
+        <div className="lg:col-span-3">
+          <div className="bg-white rounded-3xl border border-border overflow-hidden">
+            <div className="flex border-b border-border overflow-x-auto no-scrollbar">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as Tab)}
+                  className={`px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+                    activeTab === tab.id
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-text-muted hover:text-text-main'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            
+            <div className="p-6">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {activeTab === 'resume' && <ResumeTab />}
+                  {activeTab === 'private' && canSeePrivateTabs && <PrivateInfoTab userId={isOwnProfile ? undefined : displayUser.id} />}
+                  {activeTab === 'salary' && canSeePrivateTabs && <SalaryInfoTab userId={isOwnProfile ? undefined : displayUser.id} />}
+                  {activeTab === 'security' && canSeePrivateTabs && <SecurityTab />}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Tabs Navigation */}
-      <div className="border-b border-neutral-200">
-        <nav className="flex space-x-8" aria-label="Tabs">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`
-                relative whitespace-nowrap py-4 px-1 text-sm font-medium
-                ${activeTab === tab.id
-                  ? 'text-primary-700'
-                  : 'text-text-secondary hover:text-text-main hover:border-gray-300'
-                }
-              `}
-            >
-              {tab.label}
-              {activeTab === tab.id && (
-                <motion.div
-                  layoutId="activeTab"
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-600"
-                  initial={false}
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                />
-              )}
-            </button>
-          ))}
-        </nav>
-      </div>
-
-      {/* Tab Content */}
-      <div className="mt-6">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-          >
-            {activeTab === 'resume' && <ResumeTab />}
-            {activeTab === 'private' && <PrivateInfoTab />}
-            {activeTab === 'salary' && <SalaryInfoTab />}
-            {activeTab === 'security' && <SecurityTab />}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {/* Edit Modal */}
+      {/* Edit Profile Modal */}
       <AnimatePresence>
         {isEditing && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+          >
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-bg-card w-full max-w-md rounded-2xl shadow-xl overflow-hidden"
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden"
             >
-              <div className="flex items-center justify-between p-6 border-b border-border">
-                <h2 className="text-xl font-bold text-text-heading">Edit Profile</h2>
-                <button
-                  onClick={() => setIsEditing(false)}
-                  className="p-2 text-text-muted hover:bg-bg-main rounded-xl transition-colors"
-                >
+              <div className="flex justify-between items-center p-6 border-b border-border">
+                <h3 className="text-lg font-bold text-text-heading">Edit Profile</h3>
+                <button onClick={() => setIsEditing(false)} className="text-text-muted hover:text-text-main">
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <form onSubmit={handleUpdateProfile} className="p-6 space-y-4">
+              <div className="p-6 space-y-4">
                 <Input
                   label="Full Name"
                   value={formData.full_name}
                   onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                  required
                 />
                 <Input
                   label="Phone Number"
@@ -174,17 +216,13 @@ export function ProfilePage() {
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 />
-                <div className="pt-4 flex justify-end gap-3">
-                  <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" isLoading={loading}>
-                    Save Changes
-                  </Button>
-                </div>
-              </form>
+              </div>
+              <div className="p-6 bg-bg-main border-t border-border flex justify-end gap-3">
+                <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
+                <Button onClick={handleSaveProfile} isLoading={loading}>Save Changes</Button>
+              </div>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

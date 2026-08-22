@@ -1,12 +1,16 @@
+import uuid
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import jwt
 
 from app.core.config import settings
 from app.core.security import create_access_token, create_refresh_token
-from app.dependencies.auth import get_current_user
+from app.dependencies.auth import get_current_user, get_current_admin
 from app.dependencies.db import get_db
 from app.models.user import User
 from app.schemas.auth import TokenResponse
@@ -116,8 +120,6 @@ async def refresh_token(
             detail="Invalid or expired refresh token",
         )
 
-    import uuid
-    from sqlalchemy import select
     try:
         user_uuid = uuid.UUID(user_id)
     except ValueError:
@@ -150,9 +152,7 @@ async def get_me(current_user: User = Depends(get_current_user)):
     """Get the currently authenticated user's profile."""
     return current_user
 
-
 from app.schemas.user import UserUpdate, UserAdminUpdate
-from typing import List
 
 @router.put("/me", response_model=UserResponse)
 async def update_me(
@@ -172,11 +172,29 @@ async def update_me(
 
 @router.get("/users", response_model=List[UserResponse])
 async def get_all_users(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_admin: User = Depends(get_current_admin),
 ):
-    """Get all users (for HR/Admin viewing employees)."""
-    # Anyone authenticated can view users for now (needed for Employee directory)
-    from sqlalchemy import select
-    result = await db.execute(select(User).order_by(User.full_name))
+    """
+    Get all users. Only for admin/hr.
+    """
+    stmt = select(User)
+    result = await db.execute(stmt)
     return result.scalars().all()
+
+
+@router.get("/users/{user_id}", response_model=UserResponse)
+async def get_user_by_id(
+    user_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Get user by ID.
+    """
+    stmt = select(User).where(User.id == user_id)
+    result = await db.execute(stmt)
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user

@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/authStore';
 import apiClient from '@/lib/api-client';
 import toast from 'react-hot-toast';
 
-export function SalaryInfoTab() {
+export function SalaryInfoTab({ userId }: { userId?: string }) {
   const { user } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -22,10 +22,12 @@ export function SalaryInfoTab() {
     uan_no: '',
   });
 
+  const endpoint = userId ? `/profile/${userId}` : '/profile/me';
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const { data } = await apiClient.get('/profile/me');
+        const { data } = await apiClient.get(endpoint);
         setFormData({
           date_of_birth: data.date_of_birth || '',
           nationality: data.nationality || '',
@@ -43,7 +45,7 @@ export function SalaryInfoTab() {
       }
     };
     fetchProfile();
-  }, []);
+  }, [endpoint]);
 
   const handleSave = async () => {
     try {
@@ -53,7 +55,7 @@ export function SalaryInfoTab() {
       if (!payload.date_of_birth) payload.date_of_birth = null as any;
       if (!payload.date_of_joining) payload.date_of_joining = null as any;
       
-      await apiClient.put('/profile/me', payload);
+      await apiClient.put(endpoint, payload);
       toast.success('Salary & Bank info updated successfully');
     } catch (error) {
       console.error(error);
