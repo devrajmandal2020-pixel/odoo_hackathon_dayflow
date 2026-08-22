@@ -6,6 +6,7 @@ import type { PayrollRecord, User } from '@/types/api';
 import { DollarSign, FileText, CheckCircle, X, Plus, Receipt } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { fadeIn, slideUp } from '@/lib/motion';
+import { getErrorMessage } from '@/utils/error';
 
 export function PayrollPage() {
   const { user } = useAuthStore();
@@ -55,7 +56,7 @@ export function PayrollPage() {
       fetchPayroll();
     } catch (error: any) {
       console.error(error);
-      toast.error(error.response?.data?.detail || 'Failed to generate payslip');
+      toast.error(getErrorMessage(error, 'Failed to generate payslip'));
     } finally {
       setIsGenerating(false);
     }
@@ -92,7 +93,7 @@ export function PayrollPage() {
       fetchPayroll();
     } catch (error: any) {
       console.error(error);
-      toast.error(error.response?.data?.detail || 'Failed to generate payslip');
+      toast.error(getErrorMessage(error, 'Failed to generate payslip'));
     } finally {
       setIsGenerating(false);
     }

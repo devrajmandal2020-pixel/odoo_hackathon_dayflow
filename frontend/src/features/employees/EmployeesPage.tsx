@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import type { User } from '@/types/api';
+import { getErrorMessage } from '@/utils/error';
 
 export function EmployeesPage() {
   const { user } = useAuthStore();
@@ -59,7 +60,7 @@ export function EmployeesPage() {
       fetchEmployees();
       setFormData({ full_name: '', email: '', employee_id: '', password: '', role: 'employee' });
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'Failed to add employee');
+      toast.error(getErrorMessage(error, 'Failed to add employee'));
     } finally {
       setLoading(false);
     }

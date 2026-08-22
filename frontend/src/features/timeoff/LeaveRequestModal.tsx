@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import toast from 'react-hot-toast';
 import apiClient from '@/lib/api-client';
+import { getErrorMessage } from '@/utils/error';
 
 interface LeaveRequestModalProps {
   isOpen: boolean;
@@ -52,7 +53,7 @@ export function LeaveRequestModal({ isOpen, onClose }: LeaveRequestModalProps) {
       setFile(null);
       onClose();
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'Failed to submit request');
+      toast.error(getErrorMessage(error, 'Failed to submit request'));
     } finally {
       setLoading(false);
     }

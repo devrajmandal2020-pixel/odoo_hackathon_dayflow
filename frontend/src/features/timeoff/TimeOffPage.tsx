@@ -10,6 +10,7 @@ import { LeaveRequestModal } from './LeaveRequestModal';
 import type { LeaveRequest, LeaveBalance } from '@/types/api';
 import apiClient from '@/lib/api-client';
 import toast from 'react-hot-toast';
+import { getErrorMessage } from '@/utils/error';
 
 export function TimeOffPage() {
   const { user } = useAuthStore();
@@ -54,7 +55,7 @@ export function TimeOffPage() {
       toast.success(`Request ${status}`);
       fetchTimeOffData();
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || `Failed to ${status} request`);
+      toast.error(getErrorMessage(error, `Failed to ${status} request`));
     }
   };
 
@@ -72,6 +73,16 @@ export function TimeOffPage() {
       case 'casual': return 'Casual Leave';
       case 'paid': return 'Paid Leave';
       default: return type;
+    }
+  };
+
+  const formatDate = (dateStr: string | null | undefined) => {
+    if (!dateStr) return 'N/A';
+    try {
+      const d = new Date(dateStr.replace(' ', 'T'));
+      return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString();
+    } catch (e) {
+      return dateStr;
     }
   };
 
@@ -232,7 +243,7 @@ export function TimeOffPage() {
                       {getStatusBadge(req.status)}
                     </td>
                     <td className="px-6 py-4 text-text-muted">
-                      {new Date(req.created_at || '').toLocaleDateString()}
+                      {formatDate(req.created_at)}
                     </td>
                   </tr>
                 ))}
