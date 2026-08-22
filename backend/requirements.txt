@@ -1,0 +1,11 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.34.0
+pydantic>=2.10.0
+pydantic-settings>=2.14.0
+sqlalchemy>=2.0.50
+alembic>=1.19.0
+aiosqlite>=0.20.0
+pyjwt[crypto]>=2.13.0
+pwdlib[argon2,bcrypt]>=0.3.0
+python-multipart>=0.0.20
+email-validator>=2.0.0
