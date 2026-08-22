@@ -28,22 +28,6 @@ export function TalentCard({ totalEmployees = 120, newHires = 80 }: Partial<Tale
         </div>
       </div>
 
-      <div className="flex justify-between items-center bg-white/10 rounded-2xl p-3 mb-6 backdrop-blur-sm">
-        <div className="flex -space-x-3">
-          <div className="w-10 h-10 rounded-full border-2 border-primary bg-primary-100 flex items-center justify-center overflow-hidden">
-            <span className="text-primary text-xs font-bold">SM</span>
-          </div>
-          <div className="w-10 h-10 rounded-full border-2 border-primary bg-accent-blue/20 flex items-center justify-center overflow-hidden">
-            <span className="text-white text-xs font-bold">JD</span>
-          </div>
-        </div>
-        <Button 
-          onClick={() => toast.success('Joining interview call...')}
-          size="sm" variant="secondary" className="bg-white text-primary hover:bg-gray-100 h-9 rounded-full px-4 text-xs font-bold shadow-sm">
-          Join call
-        </Button>
-      </div>
-
       <div className="flex gap-8 mb-4">
         <div>
           <div className="flex items-center gap-2">
