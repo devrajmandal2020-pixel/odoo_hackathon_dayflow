@@ -1,13 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, Bell, Settings, Check } from 'lucide-react';
+import { Search, Bell, Settings, Check, Menu } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { Avatar } from '@/components/ui/Avatar';
 import { fadeIn } from '@/lib/motion';
 import apiClient from '@/lib/api-client';
 import type { Notification } from '@/types/api';
 
-export function Navbar() {
+interface NavbarProps {
+  onMenuClick?: () => void;
+}
+
+export function Navbar({ onMenuClick }: NavbarProps) {
   const { user } = useAuthStore();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -60,20 +64,25 @@ export function Navbar() {
       variants={fadeIn}
       initial="hidden"
       animate="visible"
-      className="h-16 bg-bg-card/80 backdrop-blur-sm border-b border-border px-6 flex items-center justify-between sticky top-0 z-30"
+      className="h-16 bg-bg-card/80 backdrop-blur-sm border-b border-border px-4 md:px-6 flex items-center justify-between sticky top-0 z-30"
     >
-      {/* Left: Breadcrumb + Greeting */}
-      <div>
-        <p className="text-xs text-text-muted">Portal &gt; Dashboard</p>
-        <h1 className="text-lg font-semibold text-text-heading">
-          {getGreeting()}{user?.full_name ? `, ${user.full_name.split(' ')[0]}` : ''}
-        </h1>
+      {/* Left: Hamburger + Breadcrumb + Greeting */}
+      <div className="flex items-center gap-3">
+        <button onClick={onMenuClick} className="md:hidden p-2 -ml-2 text-text-muted hover:bg-bg-main rounded-xl">
+          <Menu className="w-5 h-5" />
+        </button>
+        <div>
+          <p className="text-xs text-text-muted hidden sm:block">Portal &gt; Dashboard</p>
+          <h1 className="text-base md:text-lg font-semibold text-text-heading">
+            {getGreeting()}{user?.full_name ? `, ${user.full_name.split(' ')[0]}` : ''}
+          </h1>
+        </div>
       </div>
 
       {/* Right: Search + Actions */}
       <div className="flex items-center gap-3">
         {/* Search */}
-        <div className="relative">
+        <div className="relative hidden md:block">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
           <input
             type="text"

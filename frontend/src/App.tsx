@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { RegisterPage } from '@/features/auth/RegisterPage';
@@ -14,11 +15,12 @@ import { TimeOffPage } from '@/features/timeoff/TimeOffPage';
 import { PayrollPage } from '@/features/payroll/PayrollPage';
 
 function AppLayout() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   return (
     <div className="flex min-h-screen bg-bg-main">
-      <Sidebar />
-      <div className="flex-1 ml-64">
-        <Navbar />
+      <Sidebar isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
+      <div className="flex-1 md:ml-64 w-full overflow-x-hidden">
+        <Navbar onMenuClick={() => setIsMobileMenuOpen(true)} />
         <PageWrapper />
       </div>
     </div>
