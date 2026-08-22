@@ -163,7 +163,10 @@ export function Navbar({ onMenuClick }: NavbarProps) {
         </div>
 
         {/* Settings */}
-        <button className="p-2 rounded-xl hover:bg-bg-main transition-colors cursor-pointer">
+        <button 
+          onClick={() => window.location.href = '/profile'}
+          className="p-2 rounded-xl hover:bg-bg-main transition-colors cursor-pointer"
+        >
           <Settings className="w-5 h-5 text-text-body" />
         </button>
 

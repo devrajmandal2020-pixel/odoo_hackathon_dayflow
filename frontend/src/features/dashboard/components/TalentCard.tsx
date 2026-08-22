@@ -1,6 +1,8 @@
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 interface TalentCardProps {
   totalEmployees: number;
@@ -19,10 +21,10 @@ export function TalentCard({ totalEmployees = 120, newHires = 80 }: Partial<Tale
       <div className="flex justify-between items-start mb-6">
         <div>
           <p className="text-xs font-medium text-primary-100 uppercase tracking-wider mb-1">Hiring statistics</p>
-          <h3 className="text-xl font-bold flex items-center gap-2 cursor-pointer hover:text-white/80 transition-colors">
+          <Link to="/" className="text-xl font-bold flex items-center gap-2 cursor-pointer hover:text-white/80 transition-colors">
             Talent recruitment
             <ArrowRight className="w-4 h-4" />
-          </h3>
+          </Link>
         </div>
       </div>
 
@@ -35,7 +37,9 @@ export function TalentCard({ totalEmployees = 120, newHires = 80 }: Partial<Tale
             <span className="text-white text-xs font-bold">JD</span>
           </div>
         </div>
-        <Button size="sm" variant="secondary" className="bg-white text-primary hover:bg-gray-100 h-9 rounded-full px-4 text-xs font-bold shadow-sm">
+        <Button 
+          onClick={() => toast.success('Joining interview call...')}
+          size="sm" variant="secondary" className="bg-white text-primary hover:bg-gray-100 h-9 rounded-full px-4 text-xs font-bold shadow-sm">
           Join call
         </Button>
       </div>

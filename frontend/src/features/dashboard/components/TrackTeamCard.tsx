@@ -1,6 +1,7 @@
 import { Card } from '@/components/ui/Card';
 import { ArrowRight } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { Link } from 'react-router-dom';
 
 interface TrackTeamCardProps {
   inOffice: number;
@@ -24,10 +25,10 @@ export function TrackTeamCard({ inOffice = 48, wfh = 27, onLeave = 18, absent = 
       <div className="flex justify-between items-start mb-6">
         <div>
           <p className="text-xs font-medium text-text-muted uppercase tracking-wider mb-1">Total employee</p>
-          <h3 className="text-xl font-bold text-text-heading flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+          <Link to="/" className="text-xl font-bold text-text-heading flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
             Track your team
             <ArrowRight className="w-4 h-4" />
-          </h3>
+          </Link>
         </div>
       </div>
 

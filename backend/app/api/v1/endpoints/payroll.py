@@ -24,13 +24,13 @@ async def generate_payroll(
     current_admin: User = Depends(get_current_admin),
 ):
     # Check if already generated
-    stmt_check = select(PayrollRecord).where(
+    stmt_check = select(PayrollRecord).options(selectinload(PayrollRecord.user)).where(
         PayrollRecord.user_id == request.user_id,
         PayrollRecord.month == request.month
     )
     existing = await db.scalar(stmt_check)
     if existing:
-        raise HTTPException(status_code=400, detail="Payroll already generated for this month")
+        return existing
 
     # Fetch SalaryInfo (use fallbacks if missing or incomplete)
     stmt_salary = select(SalaryInfo).where(SalaryInfo.user_id == request.user_id)

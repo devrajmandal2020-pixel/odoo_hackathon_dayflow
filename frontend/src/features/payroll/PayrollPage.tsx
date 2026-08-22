@@ -45,9 +45,9 @@ export function PayrollPage() {
       });
       toast.success('Payslip generated successfully');
       fetchPayroll();
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast.error('Failed to generate payslip');
+      toast.error(error.response?.data?.detail || 'Failed to generate payslip');
     } finally {
       setIsGenerating(false);
     }
