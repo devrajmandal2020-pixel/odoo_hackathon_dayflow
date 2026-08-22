@@ -1,8 +1,6 @@
 import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
 
 interface TalentCardProps {
   totalEmployees: number;

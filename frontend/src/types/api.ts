@@ -86,6 +86,7 @@ export interface LeaveRequest {
     full_name: string;
     employee_id: string;
   };
+  medical_certificate_url?: string;
 }
 
 export interface LeaveBalance {
