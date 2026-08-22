@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
+import { useAuthStore } from '@/store/authStore';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { RegisterPage } from '@/features/auth/RegisterPage';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
@@ -25,6 +26,16 @@ function AppLayout() {
       </div>
     </div>
   );
+}
+
+function RoleBasedIndex() {
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === 'admin' || user?.role === 'hr';
+  
+  if (isAdmin) {
+    return <EmployeesPage />;
+  }
+  return <Navigate to="/dashboard" replace />;
 }
 
 function App() {
@@ -70,7 +81,7 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<EmployeesPage />} />
+            <Route index element={<RoleBasedIndex />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             {/* Future routes */}
             <Route path="/profile" element={<ProfilePage />} />
