@@ -21,10 +21,12 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = "postgres"
     POSTGRES_DB: str = "dayflow_db"
 
+    DATABASE_URL: str = "sqlite+aiosqlite:///./dayflow.db"
+
     @computed_field
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
-        return "sqlite+aiosqlite:///./dayflow.db"
+        return self.DATABASE_URL
 
     # CORS
     BACKEND_CORS_ORIGINS: str = '["http://localhost:5173","http://localhost:3000"]'
